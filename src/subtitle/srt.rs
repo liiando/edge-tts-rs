@@ -1,4 +1,13 @@
 //! SRT (SubRip) subtitle format utilities.
+//!
+//! Ported from `src/edge_tts/srt_composer.py` of edge-tts
+//! (https://github.com/rany2/edge-tts), itself based on
+//! https://github.com/cdown/srt. This file is licensed under the MIT License:
+//!
+//! Copyright (c) 2014-2023 Christopher Down
+//! Copyright (c) 2025- rany <rany@riseup.net>
+//!
+//! See the MIT License text in the LICENSE file at the root of this crate.
 
 use std::cmp::Ordering;
 

@@ -3,7 +3,8 @@ name = "edge-tts"
 version = "0.1.0"
 edition = "2021"
 description = "Rust port of edge-tts - Microsoft Edge TTS client"
-license = "GPL-3.0"
+license = "LGPL-3.0-only"
+repository = "https://github.com/liiando/edge-tts-rs"
 authors = ["Liando"]
 
 [dependencies]

@@ -14,16 +14,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("{} voices available", voices.len());
     
     if !voices.is_empty() {
-        println!("First voice: {} ({})", voices[0].ShortName, voices[0].Locale);
-        
+        println!("First voice: {} ({})", voices[0].short_name, voices[0].locale);
+
         // Show some English voices
         let english_voices: Vec<_> = voices.iter()
-            .filter(|v| v.Locale.starts_with("en-"))
+            .filter(|v| v.locale.starts_with("en-"))
             .take(5)
             .collect();
         println!("\nSample English voices:");
         for voice in english_voices {
-            println!("  - {} ({})", voice.ShortName, voice.Gender);
+            println!("  - {} ({})", voice.short_name, voice.gender);
         }
     }
 

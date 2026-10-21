@@ -13,11 +13,11 @@ A Rust library for Microsoft Edge's online text-to-speech service. This is a por
 
 ## Installation
 
-Add to your `Cargo.toml`:
+The crate is not published on crates.io. Add it to your `Cargo.toml` from Git:
 
 ```toml
 [dependencies]
-edge-tts = "0.1.0"
+edge-tts = { git = "https://github.com/liiando/edge-tts-rs" }
 tokio = { version = "1", features = ["full"] }
 ```
 
@@ -150,7 +150,11 @@ Use `edge-tts --list-voices` to see all available voices.
 
 ## License
 
-GPL-3.0 - See [LICENSE](LICENSE) for details.
+This library is a Rust port of [edge-tts](https://github.com/rany2/edge-tts) by rany2, and is distributed under the same license: the GNU Lesser General Public License v3.0 (LGPL-3.0). The LGPL-3.0 supplements the GNU General Public License v3.0, included in [gpl-3.0.txt](gpl-3.0.txt).
+
+`src/subtitle/srt.rs` is ported from `srt_composer.py` of the original project and is under the MIT license (Copyright (c) 2014-2023 Christopher Down, Copyright (c) 2025- rany).
+
+See [LICENSE](LICENSE) for the full texts.
 
 ## Author
 

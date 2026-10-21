@@ -142,27 +142,11 @@ impl Communicate {
             ).await;
 
             if let Err(e) = result {
-                // Check for 403 error - clock skew
-                if matches!(e, Error::WebSocket(_)) {
-                    // Try to adjust clock skew and retry
-                    DRM::adjust_clock_skew(5.0);
-                    let retry_result = Self::stream_single_chunk(
-                        &partial_text,
-                        &config,
-                        &proxy,
-                        &tx,
-                        &mut offset_compensation,
-                        &mut last_duration_offset,
-                        &mut audio_received,
-                    ).await;
-                    if let Err(retry_e) = retry_result {
-                        let _ = tx.send(Err(retry_e)).await;
-                        return Ok(());
-                    }
-                } else {
-                    let _ = tx.send(Err(e)).await;
-                    return Ok(());
-                }
+                // Clock-skew adaptive retry was planned but adjust_clock_skew
+                // is not implemented in this DRM port. Surface the original
+                // error directly.
+                let _ = tx.send(Err(e)).await;
+                return Ok(());
             }
         }
 
@@ -185,7 +169,7 @@ impl Communicate {
     ) -> Result<()> {
         // Build WebSocket URL with connection ID and security tokens
         let connection_id = connect_id();
-        let sec_ms_gec = DRM::generate_sec_ms_gec();
+        let (_ts, sec_ms_gec) = DRM::generate_sec_ms_gec(None);
         let url = format!(
             "{}&ConnectionId={}&Sec-MS-GEC={}&Sec-MS-GEC-Version={}",
             constants::wss_url(),

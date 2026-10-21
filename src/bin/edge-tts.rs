@@ -149,9 +149,9 @@ fn print_voices(voices: &[Voice]) {
     let rows: Vec<VoiceRow> = voices
         .iter()
         .map(|v| VoiceRow {
-            name: v.ShortName.clone(),
-            gender: v.Gender.clone(),
-            locale: v.Locale.clone(),
+            name: v.short_name.clone(),
+            gender: v.gender.clone(),
+            locale: v.locale.clone(),
         })
         .collect();
 

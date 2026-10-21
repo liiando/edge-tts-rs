@@ -1,53 +1,47 @@
 //! Voice management for Microsoft Edge TTS.
 
-use crate::constants::{voice_headers, voice_list_url};
+use crate::constants::{self, voice_headers, voice_list_url};
+use crate::drm::DRM;
 use crate::error::{Error, Result};
 use serde::{Deserialize, Serialize};
 
 /// Voice information from Microsoft Edge TTS service.
+///
+/// Field names use Rust snake_case but the JSON wire format from Microsoft
+/// is PascalCase, so each field is renamed at (de)serialization.
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
 pub struct Voice {
     /// Voice name in Microsoft Server Speech format
-    #[serde(rename = "Name")]
-    pub Name: String,
+    pub name: String,
     /// Display name for the voice
-    #[serde(rename = "DisplayName")]
-    pub DisplayName: String,
+    pub display_name: String,
     /// Localized name (if applicable)
-    #[serde(rename = "LocalName")]
-    pub LocalName: String,
+    pub local_name: String,
     /// Short name (e.g., "en-US-AvaNeural")
-    #[serde(rename = "ShortName")]
-    pub ShortName: String,
+    pub short_name: String,
     /// Gender ("Male" or "Female")
-    #[serde(rename = "Gender")]
-    pub Gender: String,
+    pub gender: String,
     /// Locale (e.g., "en-US")
-    #[serde(rename = "Locale")]
-    pub Locale: String,
+    pub locale: String,
     /// Whether the voice is neural
-    #[serde(rename = "SuggestedCodec")]
-    pub SuggestedCodec: String,
+    pub suggested_codec: String,
     /// Friendly name with locale
-    #[serde(rename = "FriendlyName")]
-    pub FriendlyName: String,
+    pub friendly_name: String,
     /// Status (usually "Standard")
-    #[serde(rename = "Status")]
-    pub Status: String,
+    pub status: String,
     /// Voice tags
-    #[serde(rename = "VoiceTag")]
-    pub VoiceTag: VoiceTag,
+    pub voice_tag: VoiceTag,
 }
 
-/// Voice tag information
+/// Voice tag information.
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "PascalCase")]
 pub struct VoiceTag {
     /// List of content categories the voice is suitable for
-    #[serde(rename = "ContentCategories")]
-    pub ContentCategories: Vec<String>,
+    pub content_categories: Vec<String>,
     /// List of voice personalities
-    #[serde(rename = "VoicePersonalities")]
-    pub VoicePersonalities: Vec<String>,
+    pub voice_personalities: Vec<String>,
 }
 
 /// Manager for filtering and searching voices.
@@ -88,17 +82,17 @@ impl VoicesManager {
             .iter()
             .filter(|voice| {
                 if let Some(g) = gender {
-                    if voice.Gender != g {
+                    if voice.gender != g {
                         return false;
                     }
                 }
                 if let Some(l) = locale {
-                    if !voice.Locale.eq_ignore_ascii_case(l) {
+                    if !voice.locale.eq_ignore_ascii_case(l) {
                         return false;
                     }
                 }
                 if let Some(lang) = language {
-                    if !voice.Locale.to_lowercase().starts_with(&lang.to_lowercase()) {
+                    if !voice.locale.to_lowercase().starts_with(&lang.to_lowercase()) {
                         return false;
                     }
                 }
@@ -147,21 +141,27 @@ impl VoicesManager {
 /// ```
 pub async fn list_voices(_proxy: Option<&str>) -> Result<Vec<Voice>> {
     let client = reqwest::Client::new();
-    let url = voice_list_url();
-    
+    let (_ts, sec_ms_gec) = DRM::generate_sec_ms_gec(None);
+    let url = format!(
+        "{}&Sec-MS-GEC={}&Sec-MS-GEC-Version={}",
+        voice_list_url(),
+        sec_ms_gec,
+        constants::SEC_MS_GEC_VERSION
+    );
+
     let response = client
         .get(&url)
         .headers(voice_headers())
         .send()
         .await?;
-    
+
     if !response.status().is_success() {
         return Err(Error::Http(response.error_for_status().unwrap_err()));
     }
-    
+
     let text = response.text().await?;
     let voices: Vec<Voice> = serde_json::from_str(&text)?;
-    
+
     Ok(voices)
 }
 
@@ -175,7 +175,7 @@ mod tests {
         assert!(!voices.is_empty());
         
         // Check that we have at least some expected voices
-        let has_english = voices.iter().any(|v| v.Locale.starts_with("en"));
+        let has_english = voices.iter().any(|v| v.locale.starts_with("en"));
         assert!(has_english);
     }
 }
