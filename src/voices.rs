@@ -14,10 +14,12 @@ use serde::{Deserialize, Serialize};
 pub struct Voice {
     /// Voice name in Microsoft Server Speech format
     pub name: String,
-    /// Display name for the voice
-    pub display_name: String,
-    /// Localized name (if applicable)
-    pub local_name: String,
+    /// Display name for the voice (no longer sent by the voice list)
+    #[serde(default)]
+    pub display_name: Option<String>,
+    /// Localized name (no longer sent by the voice list)
+    #[serde(default)]
+    pub local_name: Option<String>,
     /// Short name (e.g., "en-US-AvaNeural")
     pub short_name: String,
     /// Gender ("Male" or "Female")

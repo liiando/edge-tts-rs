@@ -550,12 +550,14 @@ fn create_ssml(text: &str, voice: &str, rate: &str, volume: &str, pitch: &str) -
 }
 
 /// Escape XML special characters
+///
+/// Only `&`, `<` and `>`, like Python's `xml.sax.saxutils.escape`: the text is
+/// element content, and the service does not read `&apos;` as an apostrophe
+/// (French "c'est" came out longer and garbled).
 fn escape_xml(text: &str) -> String {
     text.replace('&', "&amp;")
         .replace('<', "&lt;")
         .replace('>', "&gt;")
-        .replace('"', "&quot;")
-        .replace('\'', "&apos;")
 }
 
 /// Remove incompatible characters (control characters)
@@ -882,7 +884,7 @@ mod tests {
     fn test_escape_xml() {
         assert_eq!(escape_xml("Hello & Goodbye"), "Hello &amp; Goodbye");
         assert_eq!(escape_xml("<tag>"), "&lt;tag&gt;");
-        assert_eq!(escape_xml("'quoted'"), "&apos;quoted&apos;");
+        assert_eq!(escape_xml("c'est \"cité\""), "c'est \"cité\"");
     }
 
     #[test]
