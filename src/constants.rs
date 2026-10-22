@@ -16,7 +16,7 @@ pub const CHROMIUM_FULL_VERSION: &str = "143.0.3650.75";
 pub const CHROMIUM_MAJOR_VERSION: &str = "143";
 
 /// Security token version
-pub const SEC_MS_GEC_VERSION: &str = "1-143.0.3650.75";
+pub const SEC_MS_GEC_VERSION: &str = "2-143.0.3650.75";
 
 /// Generate the WebSocket URL for TTS
 pub fn wss_url() -> String {
